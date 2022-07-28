@@ -1,0 +1,49 @@
+![CC-BY](https://i.creativecommons.org/l/by/4.0/80x15.png)
+
+'Extra' provider
+================
+
+This is an extra provider for OpenSSL 3, with stuff that doesn't exist
+there for diverse reasons, ranging from having fallen so much out of
+favor that it isn't included even in the legacy provider, to stuff
+that is too experimental, or needs to mature further before inclusion
+in OpenSSL's official providers.
+
+Essentially, if you really want to use some very old algorithm of some
+sort, or want to play on the bleeding edge, or are in a rush trying
+something new, chances are you'll find it here.
+
+Building
+--------
+
+Building this provider requires [cmake](https://cmake.org) and a
+building toolchain that it supports.
+
+Simple configuration, for a system installation of OpenSSL 3:
+
+    cmake -S . -B _build
+
+If you have OpenSSL 3 installed somewhere else, do the following
+instead, with `{path}` replaced with the directory of an OpenSSL 3
+*installation*:
+
+    cmake -DCMAKE_PREFIX_PATH={path} -S . -B _build
+
+To build, do this:
+
+    cmake --build _build
+
+The result is `_build/extra.so` or `_build/extra.dll`.
+
+Usage examples
+--------------
+
+Listing this repository:
+
+``` console
+$ openssl list -provider-path _build/ -provider extra -providers -verbose
+Providers:
+  extra
+    version: 0.1
+    build info: Debug
+```
