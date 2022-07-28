@@ -50,7 +50,8 @@ endif()
 add_subdirectory(libprov)
 
 # Provider module
-add_library(extra MODULE extra.c)
+add_library(extra MODULE extra.c
+  crypt.c)
 set_target_properties(extra PROPERTIES
   PREFIX "" OUTPUT_NAME "extra" SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 target_compile_definitions(extra PRIVATE

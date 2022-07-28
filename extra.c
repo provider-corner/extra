@@ -19,6 +19,9 @@
  *****/
 
 static const OSSL_ITEM reason_strings[] = {
+    { EXTRA_E_INVALID_KEYLEN, "Invalid key length" },
+    { EXTRA_E_CRYPT_DERIVE_FAILED, "key derivation failed" },
+    { EXTRA_E_CRYPT_SALT_TOO_SMALL, "salt is to small" },
     { 0, NULL }
 };
 
@@ -56,6 +59,12 @@ static struct provider_ctx_st *provider_ctx_new(const OSSL_CORE_HANDLE *core,
  *
  *****/
 
+/* The table of kdfs this provider offers */
+static const OSSL_ALGORITHM kdfs[] = {
+    { "crypt", NULL, crypt_functions },
+    { NULL , NULL, NULL }
+};
+
 /*
  * Forward declarations to ensure we get signatures right.  All the
  * OSSL_FUNC_* types come from <openssl/core_dispatch.h>
@@ -70,6 +79,10 @@ static const OSSL_ALGORITHM *extra_prov_operation(void *vprovctx,
                                                      int *no_cache)
 {
     *no_cache = 0;
+    switch (operation_id) {
+    case OSSL_OP_KDF:
+        return kdfs;
+    }
     return NULL;
 }
 
