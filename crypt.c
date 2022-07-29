@@ -5,16 +5,22 @@
 #include <assert.h>
 
 /*
- * We're calling DES_fcrypt(). which is deprecated.
- * Defining this macro suppresses the deprecation warning.
- * NOTE: This will NOT build well with a libcrypto that has been
- * configured with 'no-deprecated'.  Don't even try!
+ * We use the standard POSIX crypt, when we can.  On Windows, we need
+ * some other library function like...  Oh, OpenSSL's DES_crypt()!
+ *
+ * CMakeLists.txt must ensure that the correct library is linked.
+ * -lcrypt on Unix and MacOS, libcrypto.lib on Windows.
  */
-#define OPENSSL_SUPPRESS_DEPRECATED
+#ifdef _MSC_VER
+# define OPENSSL_SUPPRESS_DEPRECATED
+# include <openssl/des.h>
+# define crypt(p,s) (DES_crypt((p),(s)))
+#else
+# include <crypt.h>
+#endif
 
 #include <openssl/core.h>
 #include <openssl/core_dispatch.h>
-#include <openssl/des.h>
 #include <openssl/err.h>
 
 #include "prov/err.h"
@@ -115,22 +121,29 @@ static int crypt_derive(void *vctx, unsigned char *key, size_t keylen,
                         const OSSL_PARAM params[])
 {
     struct crypt_ctx_st *ctx = vctx;
-    unsigned char buff[RESULTING_KEYLENGTH + 1];
+    char *result = NULL;
+    size_t result_len = 0;
 
     if (params != NULL
         && !crypt_set_ctx_params(ctx, params))
         return 0;
 
-    if (keylen != RESULTING_KEYLENGTH) {
+    if ((result = crypt(ctx->pass, ctx->salt)) == NULL) {
+        ERR_raise(ERR_HANDLE(ctx), EXTRA_E_CRYPT_DERIVE_FAILED);
+        return 0;
+    }
+
+    /*
+     * All possible results are fixed size... we hope.  The KDF interface
+     * makes it hard to have variable size results.
+     */
+    result_len = strlen(result);
+    if (keylen != result_len) {
         ERR_raise(ERR_HANDLE(ctx), EXTRA_E_INVALID_KEYLEN);
         return 0;
     }
 
-    if (DES_fcrypt(ctx->pass, ctx->salt, buff) == NULL) {
-        ERR_raise(ERR_HANDLE(ctx), EXTRA_E_CRYPT_DERIVE_FAILED);
-        return 0;
-    }
-    memcpy(key, buff, keylen);
+    memcpy(key, result, keylen);
     return 1;
 }
 

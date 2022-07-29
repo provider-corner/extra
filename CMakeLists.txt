@@ -51,6 +51,10 @@ endif()
 add_subdirectory(libprov)
 
 # Provider module
+set(CRYPTLIB crypt)
+if (DEFINED MSVC_VERSION)
+  set(CRYPTLIB OpenSSL::Crypto)
+endif()
 add_library(extra MODULE extra.c
   crypt.c)
 set_target_properties(extra PROPERTIES
@@ -60,7 +64,7 @@ target_compile_definitions(extra PRIVATE
   BUILDTYPE="${CMAKE_BUILD_TYPE}"
   )
 target_include_directories(extra PRIVATE ${OPENSSL_INCLUDE_DIR})
-target_link_libraries(extra PRIVATE libprov OpenSSL::Crypto)
+target_link_libraries(extra PRIVATE libprov ${CRYPTLIB})
 
 # Testing
 set(TEST_ENVIRONMENT
