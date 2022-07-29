@@ -16,6 +16,10 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.platform.arch }}
+      - name: install cpanm and Test2::V0
+        uses: perl-actions/install-with-cpanm@v1
+        with:
+          install: Test2::V0
       - name: checkout Extra
         uses: actions/checkout@v2
         with:
@@ -40,3 +44,6 @@ jobs:
           cmake -A  ${{ matrix.platform.arch }} -DCMAKE_PREFIX_PATH="$cwd\openssl-install" -S . -B _build
       - name: build the Extra provider
         run: cmake --build _build
+      - name: test the Extra provider
+        run: ctest -VV
+        working-directory: _build
