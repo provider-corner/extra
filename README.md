@@ -1,3 +1,6 @@
+[![github actions ci badge]][github actions ci]
+[![github actions windows ci badge]][github actions windows ci]
+
 ![CC-BY](https://i.creativecommons.org/l/by/4.0/80x15.png)
 
 'Extra' provider
@@ -72,3 +75,22 @@ Example usage, using the `openssl` command:
 $ openssl kdf -provider-path _build/ -provider extra -provider default -keylen 13 -kdfopt pass:12345 -kdfopt salt:xx -binary crypt
 xxwddmriJc5TI
 ```
+
+<!-- Logos and Badges -->
+
+[github actions ci badge]:
+    <https://github.com/provider-corner/extra/workflows/GitHub%20CI/badge.svg>
+    "GitHub Actions CI Status"
+
+[github actions ci]:
+    <https://github.com/provider-corner/extra/actions?query=workflow%3A%22GitHub+CI%22>
+    "GitHub Actions CI"
+
+[github actions windows ci badge]:
+    <https://github.com/provider-corner/extra/workflows/Windows%20GitHub%20CI/badge.svg>
+    "GitHub Actions CI Status"
+
+[github actions windows ci]:
+    <https://github.com/provider-corner/extra/actions?query=workflow%3A%22Windows+GitHub+CI%22>
+    "GitHub Actions CI"
+
