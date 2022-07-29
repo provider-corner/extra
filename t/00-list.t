@@ -7,3 +7,6 @@ plan(2);
 like(`openssl list -provider extra -providers`,
      qr/Providers:\n\s+extra\n\s+version:/,
      'check that the extra provider is listed');
+like(`openssl list -provider extra -kdf-algorithms`,
+     qr/crypt \@ extra\n/,
+     'check that crypt @ extra is listed');
