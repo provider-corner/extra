@@ -11,6 +11,7 @@ include(CheckFunctionExists)
 
 enable_testing()
 
+set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL 3.0 REQUIRED)
 
 if (NOT DEFINED OPENSSL_ROOT_DIR)
@@ -59,7 +60,7 @@ target_compile_definitions(extra PRIVATE
   BUILDTYPE="${CMAKE_BUILD_TYPE}"
   )
 target_include_directories(extra PRIVATE ${OPENSSL_INCLUDE_DIR})
-target_link_libraries(extra PRIVATE libprov)
+target_link_libraries(extra PRIVATE libprov OpenSSL::Crypto)
 
 # Testing
 set(TEST_ENVIRONMENT
