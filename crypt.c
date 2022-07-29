@@ -11,10 +11,12 @@
  * CMakeLists.txt must ensure that the correct library is linked.
  * -lcrypt on Unix and MacOS, libcrypto.lib on Windows.
  */
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 # define OPENSSL_SUPPRESS_DEPRECATED
 # include <openssl/des.h>
 # define crypt(p,s) (DES_crypt((p),(s)))
+#elif defined(__APPLE__)
+# include <unistd.h>
 #else
 # include <crypt.h>
 #endif
