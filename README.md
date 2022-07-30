@@ -79,11 +79,11 @@ xxwddmriJc5TI
 <!-- Logos and Badges -->
 
 [github actions ci badge]:
-    <https://github.com/provider-corner/extra/workflows/GitHub%20CI/badge.svg>
+    <https://github.com/provider-corner/extra/workflows/Linux%20%26%20MacOS%20GitHub%20CI/badge.svg>
     "GitHub Actions CI Status"
 
 [github actions ci]:
-    <https://github.com/provider-corner/extra/actions?query=workflow%3A%22GitHub+CI%22>
+    <https://github.com/provider-corner/extra/actions?query=workflow%3A%22Linux%20%26%20MacOS%20GitHub+CI%22>
     "GitHub Actions CI"
 
 [github actions windows ci badge]:
