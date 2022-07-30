@@ -45,5 +45,5 @@ jobs:
       - name: build the Extra provider
         run: cmake --build _build
       - name: test the Extra provider
-        run: ctest -VV
+        run: ctest -VV -C Debug
         working-directory: _build
