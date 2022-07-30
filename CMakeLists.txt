@@ -50,13 +50,20 @@ endif()
 
 add_subdirectory(libprov)
 
-# Provider module
-set(CRYPTLIB crypt)
-if (DEFINED MSVC_VERSION)
-  set(CRYPTLIB OpenSSL::Crypto)
-endif()
+# Provider module sources
 add_library(extra MODULE extra.c
   crypt.c)
+
+# For crypt.c, different libraries are needed depending on platform
+# Only Windows uses OpenSSL::Crypto (support for Windows will disappear
+# when OpenSSL doesn't support DES_crypt() any more)
+if (DEFINED MSVC_VERSION)
+  set(CRYPTLIB OpenSSL::Crypto)
+elseif(NOT DEFINED APPLE)
+  set(CRYPTLIB crypt)
+endif()
+
+# Putting together the provider module
 set_target_properties(extra PROPERTIES
   PREFIX "" OUTPUT_NAME "extra" SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 target_compile_definitions(extra PRIVATE
