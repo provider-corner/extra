@@ -25,8 +25,24 @@ include(libprov/cmake/provider.cmake)
 build_provider(extra "extra.c;crypt.c" "libprov;${CRYPTLIB}")
 
 # Testing
+if (DEFINED MSVC_VERSION)
+  # This is frustrating!  I've tried guessing at all sorts of variables,
+  # as well as getting the target property LIBRARY_OUTPUT_DIRECTORY using
+  # get_target_property() as well as generator expressions, but to not avail.
+  # So for now, the MODULES path gets hardcoded from observed builds.
+  if (NOT CMAKE_BUILD_TYPE)
+    # From observation, it seems that Debug is the default
+    set(EXTRA_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/Debug")
+  else()
+    set(EXTRA_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+  endif()
+else()
+  set(EXTRA_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}")
+endif()
+message(STATUS "Determined the Extra provider location to '${EXTRA_MODULE_DIRECTORY}'")
+
 set(TEST_ENVIRONMENT
-  OPENSSL_MODULES=${CMAKE_BINARY_DIR}
+  OPENSSL_MODULES=${EXTRA_MODULE_DIRECTORY}
   OPENSSL_PROGRAM=${OPENSSL_PROGRAM}
   OPENSSL_CRYPTO_LIBRARY=${OPENSSL_CRYPTO_LIBRARY}
   SOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
