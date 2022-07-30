@@ -33,7 +33,7 @@ jobs:
         run: |
           $cwd = Get-Location
           mkdir ..\openssl-install
-          perl Configure ${{matrix.platform.target}} --prefix="$cwd\..\openssl-install" no-asm
+          perl Configure ${{matrix.platform.target}} --prefix="$cwd\..\openssl-install" no-asm no-shared
         working-directory: openssl
       - name: build+install OpenSSL
         run: nmake /S install_sw
