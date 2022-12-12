@@ -1,6 +1,8 @@
 [![CC-BY]][Creative Commons Attribution 4.0 International License]
 
-This work is licensed under a [Creative Commons Attribution 4.0 International License].
+This collection work is mainly licensed under a [Creative Commons Attribution 4.0 International License].
+
+Files in `external/` have other licenses, as noted in those individual files.
 
 <!-- Icons, Logos and Badges -->
 

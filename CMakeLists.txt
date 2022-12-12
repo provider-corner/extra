@@ -22,7 +22,16 @@ elseif(NOT DEFINED APPLE)
 endif()
 
 include(libprov/cmake/provider.cmake)
-build_provider(extra "extra.c;crypt.c" "libprov;${CRYPTLIB}")
+set(extra_source
+    extra.c
+    # Implement The "crypt" KDF, using libcrypt or OpenSSL's DES_crypt()
+    crypt.c
+    # Implement MD6, with help from the reference implementation
+    # md6.c
+    external/md6/md6_mode.c
+    external/md6/md6_compress.c)
+
+build_provider(extra "${extra_source}" "libprov;${CRYPTLIB}")
 
 # Testing
 if (DEFINED MSVC_VERSION)
