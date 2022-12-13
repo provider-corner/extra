@@ -27,7 +27,7 @@ set(extra_source
     # Implement The "crypt" KDF, using libcrypt or OpenSSL's DES_crypt()
     crypt.c
     # Implement MD6, with help from the reference implementation
-    # md6.c
+    md6.c
     external/md6/md6_mode.c
     external/md6/md6_compress.c)
 
