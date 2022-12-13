@@ -87,9 +87,9 @@ static void *crypt_dupctx(void *vctx)
     if (src == NULL
         || (dst = crypt_newctx(NULL)) == NULL)
 
+    dst->provctx = src->provctx;
     dst->provctx->proverr_handle =
         proverr_dup_handle(src->provctx->proverr_handle);
-    dst->provctx = src->provctx;
 
     if (src->pass != NULL) {
         if ((dst->pass = strdup(src->pass)) == NULL) {
@@ -179,8 +179,8 @@ static int crypt_get_params(OSSL_PARAM params[])
 static const OSSL_PARAM *crypt_settable_ctx_params(void *cctx, void *provctx)
 {
     static const OSSL_PARAM table[] = {
-        { "pass", OSSL_PARAM_UTF8_STRING, NULL, sizeof(size_t), 0 },
-        { "salt", OSSL_PARAM_UTF8_STRING, NULL, sizeof(size_t), 0 },
+        { "pass", OSSL_PARAM_UTF8_STRING, NULL, 0, 0 },
+        { "salt", OSSL_PARAM_UTF8_STRING, NULL, 0, 0 },
         { NULL, 0, NULL, 0, 0 },
     };
 
