@@ -187,6 +187,8 @@ const md6_word Smask = (md6_word)0x73;
 
 #endif
 
+compression_hook_fn *compression_hook;
+
 /* Main compression loop.
 **
 */

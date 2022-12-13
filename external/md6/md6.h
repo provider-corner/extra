@@ -422,7 +422,8 @@ extern int md6_full_hash( int d,                    /* hash bit length */
 ** is called.
 */
 
-void (* compression_hook)(md6_word *C,
+typedef 
+void compression_hook_fn(md6_word *C,
 			  const md6_word *Q,
 			  md6_word *K,
 			  int ell,
@@ -435,6 +436,7 @@ void (* compression_hook)(md6_word *C,
 			  int d,
 			  md6_word *N
 			  );
+extern compression_hook_fn *compression_hook;
 
 /* end of #ifndef MD6_H_INCLUDED for multiple inclusion protection
 */
