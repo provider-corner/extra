@@ -56,7 +56,7 @@ Included algorithms
 
 ### KDFs
 
-#### crypt, and implementation of **crypt(3)**
+#### crypt, an implementation of **crypt(3)**
 
 This KDF has the following output parameter:
 
@@ -75,6 +75,34 @@ Example usage, using the `openssl` command:
 $ openssl kdf -provider-path _build/ -provider extra -provider default -keylen 13 -kdfopt pass:12345 -kdfopt salt:xx -binary crypt
 xxwddmriJc5TI
 ```
+
+### Hashes
+
+#### md6, a (forgotten?) SHA-3 contender
+
+This hash algorithm has the following input / output parameter:
+
+-   "size"; the value is an unsigned integer, and is the hash size in
+    bytes.
+-   "rounds"; the value is an integer, and is the number of rounds.
+-   "mode"; the value is an integer, and is the mode parameter.
+
+Defaults can be set for these parameters using environment variables:
+
+-   `MD6_BITS`; the hash size in bits.
+-   `MD6_ROUNDS`, the number of rounds.
+-   `MD6_MODE`, the mode parameter.
+
+##### md6 variants
+
+There are a number of variants of this algorithm:
+
+-   "md6-224"; md6 with 224-bit hash size.
+-   "md6-256"; md6 with 256-bit hash size.
+-   "md6-384"; md6 with 384-bit hash size.
+-   "md6-512"; md6 with 512-bit hash size.
+
+For all these variants, the hash size is hard coded and cannot be changed.
 
 <!-- Logos and Badges -->
 
