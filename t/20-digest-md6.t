@@ -36,7 +36,7 @@ my @cases = (
     },
 );
 
-plan(scalar(grep { $_->{enabled} } @cases));
+plan(scalar(grep { $_->{enabled} } @cases) * 2);
 
 sub generate_chars {
     my $num = shift;
@@ -67,6 +67,13 @@ foreach (@cases) {
 
     is(`cat $input | openssl dgst -provider extra -md6-$_->{size}`,
        "md6-$_->{size}(stdin)= $_->{result}\n",
-       $title);
+       $title." using md6-$_->{size}");
+
+    local $ENV{MD6_BITS}   = $_->{size};
+
+    is(`cat $input | openssl dgst -provider extra -md6`,
+       "md6(stdin)= $_->{result}\n",
+       $title." using MD6_BITS=$_->{size}");
+
     unlink $input;
 }
