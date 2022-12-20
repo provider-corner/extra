@@ -22,6 +22,8 @@ elseif(NOT DEFINED APPLE)
 endif()
 
 include(libprov/cmake/provider.cmake)
+setup_provider_openssl()
+
 set(extra_source
     extra.c
     # Implement The "crypt" KDF, using libcrypt or OpenSSL's DES_crypt()
@@ -30,7 +32,6 @@ set(extra_source
     md6.c
     external/md6/md6_mode.c
     external/md6/md6_compress.c)
-
 build_provider(extra "${extra_source}" "libprov;${CRYPTLIB}")
 
 # Testing
