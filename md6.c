@@ -270,12 +270,14 @@ static int o_md6_update(void *vctx, const unsigned char *in, size_t inl)
     /*
      * md6_update() takes the number of bits as a uint64_t, so we
      * must ensure that |inl| isn't larger than that in bits.
+     * If sizeof(inl) is less than sizeof(uint64_t), there's no point checking.
      */
-    if (inl > (((size_t)1)<<56 - 1)) {
+    if (sizeof(inl) >= sizeof(uint64_t) - 1
+        && inl > (((uint64_t)1)<<56 - 1)) {
         ERR_raise(ERR_HANDLE(ctx), EXTRA_E_INVALID_INPUT_LENGTH);
         return 0;
     }
-    rc = md6_update(&ctx->st, (unsigned char *)in, inl << 3);
+    rc = md6_update(&ctx->st, (unsigned char *)in, (uint64_t)inl << 3);
     if (rc != MD6_SUCCESS) {
         ERR_raise(ERR_HANDLE(ctx), EXTRA_E_MD6__BASE + rc);
         return 0;
