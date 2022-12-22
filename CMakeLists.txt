@@ -68,3 +68,12 @@ endif()
 add_test(NAME openssl
   COMMAND ${PROVE} -PWrapOpenSSL ${CMAKE_CURRENT_SOURCE_DIR}/t)
 set_tests_properties(openssl PROPERTIES ENVIRONMENT "${TEST_ENVIRONMENT}")
+
+# Installing
+execute_process(
+  COMMAND ${OPENSSL_PROGRAM} info -modulesdir
+  OUTPUT_VARIABLE OPENSSL_MODULES_DIR
+)
+string(STRIP "${OPENSSL_MODULES_DIR}" OPENSSL_MODULES_DIR)
+message(STATUS "Will install in ${OPENSSL_MODULES_DIR}")
+install(TARGETS extra DESTINATION ${OPENSSL_MODULES_DIR})
