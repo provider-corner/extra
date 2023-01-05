@@ -15,7 +15,7 @@ add_subdirectory(libprov)
 # For crypt.c, different libraries are needed depending on platform
 # Only Windows uses OpenSSL::Crypto (support for Windows will disappear
 # when OpenSSL doesn't support DES_crypt() any more)
-if (DEFINED MSVC_VERSION)
+if (DEFINED MSVC)
   set(CRYPTLIB OpenSSL::Crypto)
 elseif(NOT DEFINED APPLE)
   set(CRYPTLIB crypt)
@@ -35,7 +35,7 @@ set(extra_source
 build_provider(extra "${extra_source}" "libprov;${CRYPTLIB}")
 
 # Testing
-if (DEFINED MSVC_VERSION)
+if (DEFINED MSVC)
   # This is frustrating!  I've tried guessing at all sorts of variables,
   # as well as getting the target property LIBRARY_OUTPUT_DIRECTORY using
   # get_target_property() as well as generator expressions, but to not avail.
