@@ -51,6 +51,14 @@ Providers:
     build info: Debug
 ```
 
+Properties
+----------
+
+All algorithms in this provider use the property "x.author" with an
+identifier for the author of the code.  This can be used to fetch that
+particular implementation, should there be several implementations of
+the same algorithm present.
+
 Included algorithms
 -------------------
 

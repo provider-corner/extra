@@ -84,17 +84,17 @@ static struct provider_ctx_st *provider_ctx_new(const OSSL_CORE_HANDLE *core,
 
 /* The table of digests this provider offers */
 static const OSSL_ALGORITHM digests[] = {
-    { "md6", NULL, o_md6_functions },
-    { "md6-224", NULL, o_md6_224_functions },
-    { "md6-256", NULL, o_md6_256_functions },
-    { "md6-384", NULL, o_md6_384_functions },
-    { "md6-512", NULL, o_md6_512_functions },
+    { "md6", "x.author='" AUTHOR "'", o_md6_functions },
+    { "md6-224", "x.author='" AUTHOR "'", o_md6_224_functions },
+    { "md6-256", "x.author='" AUTHOR "'", o_md6_256_functions },
+    { "md6-384", "x.author='" AUTHOR "'", o_md6_384_functions },
+    { "md6-512", "x.author='" AUTHOR "'", o_md6_512_functions },
     { NULL , NULL, NULL }
 };
 
 /* The table of kdfs this provider offers */
 static const OSSL_ALGORITHM kdfs[] = {
-    { "crypt", NULL, crypt_functions },
+    { "crypt", "x.author='" AUTHOR "'", crypt_functions },
     { NULL , NULL, NULL }
 };
 
@@ -136,9 +136,13 @@ static int extra_prov_get_params(void *provctx, OSSL_PARAM *params)
             *(const void **)p->data = VERSION;
             p->return_size = strlen(VERSION);
         } else if (strcasecmp(p->key, "buildinfo") == 0
-                 && BUILDTYPE[0] != '\0') {
+                   && BUILDTYPE[0] != '\0') {
             *(const void **)p->data = BUILDTYPE;
             p->return_size = strlen(BUILDTYPE);
+        } else if (strcasecmp(p->key, "author") == 0
+                   && AUTHOR[0] != '\0') {
+            *(const void **)p->data = AUTHOR;
+            p->return_size = strlen(AUTHOR);
         }
     return ok;
 }
