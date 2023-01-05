@@ -69,11 +69,22 @@ add_test(NAME openssl
   COMMAND ${PROVE} -PWrapOpenSSL ${CMAKE_CURRENT_SOURCE_DIR}/t)
 set_tests_properties(openssl PROPERTIES ENVIRONMENT "${TEST_ENVIRONMENT}")
 
-# Installing
+# Find out where to install the provider module
+# We use well known environment variables to allow the correct shared
+# libraries to be used with the 'openssl' program.  For non-Unix platforms,
+# these variables don't matter.
+cmake_path(GET OPENSSL_SSL_LIBRARY PARENT_PATH OPENSSL_LIBRARY_DIR)
 execute_process(
-  COMMAND ${OPENSSL_PROGRAM} info -modulesdir
+  COMMAND
+    ${CMAKE_COMMAND} -E env
+      LD_LIBRARY_PATH=${OPENSSL_LIBRARY_DIR}
+      DYLD_LIBRARY_PATH=${OPENSSL_LIBRARY_DIR}
+      LIBPATH=${OPENSSL_LIBRARY_DIR}
+      ${OPENSSL_PROGRAM} info -modulesdir
   OUTPUT_VARIABLE OPENSSL_MODULES_DIR
 )
 string(STRIP "${OPENSSL_MODULES_DIR}" OPENSSL_MODULES_DIR)
 message(STATUS "Will install in ${OPENSSL_MODULES_DIR}")
+
+# Installing
 install(TARGETS extra DESTINATION ${OPENSSL_MODULES_DIR})
