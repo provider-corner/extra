@@ -181,8 +181,9 @@ struct o_md6_ctx_st {
     struct provider_ctx_st *provctx;
 
     /* Hash bit length */
+    size_t hash_bits;
     size_t hash_size;
-    int hash_size_hard_coded;
+    int hash_bits_hard_coded;
 
     /* rounds (r) */
     int rounds;
@@ -195,26 +196,19 @@ struct o_md6_ctx_st {
 };
 #define ERR_HANDLE(ctx) ((ctx)->provctx->proverr_handle)
 
-static int ctx_init(struct o_md6_ctx_st *ctx, void *vprovctx, size_t hash_size)
+static void set_defaults(struct o_md6_ctx_st *ctx)
 {
     const char *env_val;
 
-    memset(ctx, 0, sizeof(*ctx));
-    ctx->provctx = vprovctx;
-
-    ctx->hash_size = hash_size;
-    if (!ctx->hash_size_hard_coded) {
+    if (!ctx->hash_bits_hard_coded) {
         if ((env_val = getenv("MD6_BITS")) != NULL) {
             size_t bits = strtoul(env_val, NULL, 0);
 
-            if (bits == 0 || bits % 8 != 0) {
-                ERR_raise_data(ERR_HANDLE(ctx), EXTRA_E_INVALID_KEYLEN,
-                               "key length in bits must be multiple of 8");
-                return 0;
-            }
-            ctx->hash_size = bits / 8;
+            /* ctx_init detects if the number of bits is wrong */
+            ctx->hash_bits = bits;
         }
     }
+    ctx->hash_size = ctx->hash_bits / 8;
 
     ctx->mode = md6_default_L;
     if ((env_val = getenv("MD6_MODE")) != NULL)
@@ -224,24 +218,36 @@ static int ctx_init(struct o_md6_ctx_st *ctx, void *vprovctx, size_t hash_size)
     ctx->rounds = 40 + ctx->hash_size * 8 / 4;
     if ((env_val = getenv("MD6_ROUNDS")) != NULL)
         ctx->rounds = atoi(env_val);
-
-    return 1;
 }
 
-static int ctx_init_0(struct o_md6_ctx_st *ctx, void *vprovctx)
+static void ctx_init_0(struct o_md6_ctx_st *ctx)
 {
-    return ctx_init(ctx, vprovctx, 0);
+    ctx->hash_bits = 0;
 }
 
 static struct o_md6_ctx_st *newctx_init(void *vprovctx,
-                                        int (*init)(struct o_md6_ctx_st *ctx,
-                                                    void *vprovctx))
+                                        void (*init)(struct o_md6_ctx_st *ctx))
 {
-    struct o_md6_ctx_st *ctx = malloc(sizeof(*ctx));
+    struct o_md6_ctx_st *ctx;
 
-    if (ctx != NULL && !init(ctx, vprovctx)) {
-        free(ctx);
-        ctx = NULL;
+    if ((ctx = malloc(sizeof(*ctx))) != NULL) {
+        memset(ctx, 0, sizeof(*ctx));
+        ctx->provctx = vprovctx;
+
+        /* variant specific init */
+        init(ctx);
+
+        /* defaults */
+        set_defaults(ctx);
+
+        /* Check that everything seems correct */
+        if (ctx->hash_bits == 0 || ctx->hash_bits % 8 != 0) {
+            ERR_raise_data(ERR_HANDLE(ctx), EXTRA_E_INVALID_OUTPUT_SIZE,
+                           "hash output size in bits must be multiple of 8, "
+                           "but is set to %zu", ctx->hash_bits);
+            free(ctx);
+            ctx = NULL;
+        }
     }
     return ctx;
 }
@@ -364,9 +370,8 @@ static int o_md6_get_params(OSSL_PARAM params[])
 {
     struct o_md6_ctx_st fake_ctx = { 0, };
 
-    if (ctx_init_0(&fake_ctx, NULL))
-        return o_md6_get_ctx_params(&fake_ctx, params);
-    return 0;
+    set_defaults(&fake_ctx);
+    return o_md6_get_ctx_params(&fake_ctx, params);
 }
 
 /* Parameters that libcrypto can get from the context */
@@ -421,7 +426,7 @@ static const OSSL_PARAM *o_md6_settable_ctx_params(void *vctx, void *provctx)
     };
     struct o_md6_ctx_st *ctx = vctx;
 
-    if (ctx->hash_size_hard_coded)
+    if (ctx->hash_bits_hard_coded)
         return table_hard_coded;
     return table;
 }
@@ -436,7 +441,7 @@ static int o_md6_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     if (params != NULL)
         for (p = params; p->key != NULL; p++) {
             if (strcasecmp(p->key, "size") == 0) {
-                if (ctx->hash_size_hard_coded) {
+                if (ctx->hash_bits_hard_coded) {
                     ERR_raise_data(ERR_HANDLE(ctx), EXTRA_E_HARD_CODED_VALUE,
                                    "size");
                     ok = 0;
@@ -445,6 +450,7 @@ static int o_md6_set_ctx_params(void *vctx, const OSSL_PARAM params[])
                     ok = 0;
                     continue;
                 }
+                ctx->hash_bits = ctx->hash_size * 8;
             } else if (strcasecmp(p->key, "rounds") == 0
                        && provnum_get_int(&ctx->rounds, p) < 0) {
                 ok = 0;
@@ -476,10 +482,10 @@ const OSSL_DISPATCH o_md6_functions[] = {
     { 0, NULL }
 };
 
-static int ctx_init_224(struct o_md6_ctx_st *ctx, void *vprovctx)
+static void ctx_init_224(struct o_md6_ctx_st *ctx)
 {
-    ctx->hash_size_hard_coded = 1;
-    return ctx_init(ctx, vprovctx, 224 / 8);
+    ctx->hash_bits_hard_coded = 1;
+    ctx->hash_bits = 224;
 }
 
 static void *o_md6_224_newctx(void *vprovctx)
@@ -491,9 +497,9 @@ static int o_md6_224_get_params(OSSL_PARAM params[])
 {
     struct o_md6_ctx_st fake_ctx = { 0, };
 
-    if (ctx_init_224(&fake_ctx, NULL))
-        return o_md6_get_ctx_params(&fake_ctx, params);
-    return 0;
+    ctx_init_224(&fake_ctx);
+    set_defaults(&fake_ctx);
+    return o_md6_get_ctx_params(&fake_ctx, params);
 }
 
 /* The md6-224 dispatch tables */
@@ -513,10 +519,10 @@ const OSSL_DISPATCH o_md6_224_functions[] = {
     { 0, NULL }
 };
 
-static int ctx_init_256(struct o_md6_ctx_st *ctx, void *vprovctx)
+static void ctx_init_256(struct o_md6_ctx_st *ctx)
 {
-    ctx->hash_size_hard_coded = 1;
-    return ctx_init(ctx, vprovctx, 256 / 8);
+    ctx->hash_bits_hard_coded = 1;
+    ctx->hash_bits = 256;
 }
 
 static void *o_md6_256_newctx(void *vprovctx)
@@ -528,9 +534,9 @@ static int o_md6_256_get_params(OSSL_PARAM params[])
 {
     struct o_md6_ctx_st fake_ctx = { 0, };
 
-    if (ctx_init_256(&fake_ctx, NULL))
-        return o_md6_get_ctx_params(&fake_ctx, params);
-    return 0;
+    ctx_init_256(&fake_ctx);
+    set_defaults(&fake_ctx);
+    return o_md6_get_ctx_params(&fake_ctx, params);
 }
 
 /* The md6-256 dispatch tables */
@@ -550,10 +556,10 @@ const OSSL_DISPATCH o_md6_256_functions[] = {
     { 0, NULL }
 };
 
-static int ctx_init_384(struct o_md6_ctx_st *ctx, void *vprovctx)
+static void ctx_init_384(struct o_md6_ctx_st *ctx)
 {
-    ctx->hash_size_hard_coded = 1;
-    return ctx_init(ctx, vprovctx, 384 / 8);
+    ctx->hash_bits_hard_coded = 1;
+    ctx->hash_bits = 384;
 }
 
 static void *o_md6_384_newctx(void *vprovctx)
@@ -565,9 +571,9 @@ static int o_md6_384_get_params(OSSL_PARAM params[])
 {
     struct o_md6_ctx_st fake_ctx = { 0, };
 
-    if (ctx_init_384(&fake_ctx, NULL))
-        return o_md6_get_ctx_params(&fake_ctx, params);
-    return 0;
+    ctx_init_384(&fake_ctx);
+    set_defaults(&fake_ctx);
+    return o_md6_get_ctx_params(&fake_ctx, params);
 }
 
 /* The md6-384 dispatch tables */
@@ -587,10 +593,10 @@ const OSSL_DISPATCH o_md6_384_functions[] = {
     { 0, NULL }
 };
 
-static int ctx_init_512(struct o_md6_ctx_st *ctx, void *vprovctx)
+static void ctx_init_512(struct o_md6_ctx_st *ctx)
 {
-    ctx->hash_size_hard_coded = 1;
-    return ctx_init(ctx, vprovctx, 512 / 8);
+    ctx->hash_bits_hard_coded = 1;
+    ctx->hash_bits = 512;
 }
 
 static void *o_md6_512_newctx(void *vprovctx)
@@ -602,9 +608,9 @@ static int o_md6_512_get_params(OSSL_PARAM params[])
 {
     struct o_md6_ctx_st fake_ctx = { 0, };
 
-    if (ctx_init_512(&fake_ctx, NULL))
-        return o_md6_get_ctx_params(&fake_ctx, params);
-    return 0;
+    ctx_init_512(&fake_ctx);
+    set_defaults(&fake_ctx);
+    return o_md6_get_ctx_params(&fake_ctx, params);
 }
 
 /* The md6-512 dispatch tables */

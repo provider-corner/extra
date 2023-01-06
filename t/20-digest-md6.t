@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use File::Temp qw(tempfile);
 use Test2::V0;
+use IPC::Run qw(run);
 
 # The cases are taken from "Sample MD6 calculations" in
 # http://www.jayantkrish.com/papers/md6_report.pdf
@@ -36,7 +37,18 @@ my @cases = (
     },
 );
 
-plan(scalar(grep { $_->{enabled} } @cases) * 2);
+# Additional cases are things that are supposed to go wrong in diverse ways
+# For these, the result is always checked against stderr, and may be a regexp
+my @badcases = (
+    # Invalid key size
+    {
+        message => 'abc',
+        size => 7,
+        result => qr/:invalid output size:/,
+    },
+);
+
+plan(scalar(grep { $_->{enabled} } @cases) * 2 + scalar @badcases * 2);
 
 sub generate_chars {
     my $num = shift;
@@ -74,6 +86,31 @@ foreach (@cases) {
     is(`cat $input | openssl dgst -provider extra -md6`,
        "md6(stdin)= $_->{result}\n",
        $title." using MD6_BITS=$_->{size}");
+
+    unlink $input;
+}
+
+foreach (@badcases) {
+    local $ENV{MD6_BITS}   = $_->{size};
+
+    my $message = $_->{message} // generate_chars($_->{message_length});
+    (my $fh, my $input) = tempfile();
+    print $fh $message;
+    close $fh;
+
+    my $title =
+        defined $_->{message}
+        ? "check that dsgt('$message') becomes '$_->{result}'"
+        : "check that dsgt(generated $_->{message_length} characters) becomes '$_->{result}'";
+
+    my $out;
+    my $err;
+    local $ENV{MD6_BITS}   = $_->{size};
+
+    ok(!run([qw(openssl dgst -provider extra -md6)],
+            \$input, \$out, \$err));
+    like($err, $_->{result},
+         $title." using MD6_BITS=$_->{size}");
 
     unlink $input;
 }
