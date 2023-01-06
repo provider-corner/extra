@@ -207,8 +207,8 @@ static int ctx_init(struct o_md6_ctx_st *ctx, void *vprovctx, size_t hash_size)
         if ((env_val = getenv("MD6_BITS")) != NULL) {
             size_t bits = strtoul(env_val, NULL, 0);
 
-            if (bits % 8 != 0) {
-                ERR_raise_data(ERR_HANDLE(ctx), EXTRA_E_MD6_BADKEYLEN,
+            if (bits == 0 || bits % 8 != 0) {
+                ERR_raise_data(ERR_HANDLE(ctx), EXTRA_E_INVALID_KEYLEN,
                                "key length in bits must be multiple of 8");
                 return 0;
             }
