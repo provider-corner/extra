@@ -207,9 +207,15 @@ static int crypt_set_ctx_params(void *vctx, const OSSL_PARAM params[])
             free(ctx->pass);
             ctx->pass = newpass;
         } else if (strcasecmp(p->key, "salt") == 0) {
-            char *newsalt = strndup(p->data, p->data_size);
+            char *newsalt;
 
-            if (newsalt == NULL) {
+            if (p->data_size < 2) {
+                ERR_raise(ERR_HANDLE(ctx), EXTRA_E_CRYPT_SALT_TOO_SMALL);
+                ok = 0;
+                continue;
+            }
+
+            if ((newsalt = strndup(p->data, p->data_size)) == NULL) {
                 ERR_raise(ERR_HANDLE(ctx), ERR_R_MALLOC_FAILURE);
                 ok = 0;
                 continue;
