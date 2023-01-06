@@ -14,6 +14,7 @@
 #include "prov/num.h"
 
 #include "local.h"
+#include "md6_data.h"
 
 #if 0
 /* Compression hook copied from md6sum.c */

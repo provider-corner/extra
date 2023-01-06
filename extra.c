@@ -11,6 +11,8 @@
 #include "prov/num.h"
 
 #include "local.h"
+#include "crypt_data.h"
+#include "md6_data.h"
 
 /*********************************************************************
  *
@@ -19,32 +21,9 @@
  *****/
 
 static const OSSL_ITEM reason_strings[] = {
-    { EXTRA_E_INVALID_KEYLEN, "Invalid key length" },
-    { EXTRA_E_CRYPT_DERIVE_FAILED, "key derivation failed" },
-    { EXTRA_E_CRYPT_SALT_TOO_SMALL, "salt is to small" },
-    { EXTRA_E_INVALID_INPUT_LENGTH, "invalid input length" },
-    { EXTRA_E_OUTPUT_SIZE_TOO_SMALL, "output size is too small" },
-    { EXTRA_E_HARD_CODED_VALUE, "value is hard coded, may not be changed" },
-
-    /* The following errors mimic the ones in external/md6/md6.h */
-    { EXTRA_E_MD6_FAIL,                 "generic md6 failure" },
-    { EXTRA_E_MD6_BADHASHLEN,           "bad md6 hash length (allowed values are 1 to 512)" },
-    { EXTRA_E_MD6_NULLSTATE,            "null md6 state" },
-    { EXTRA_E_MD6_BADKEYLEN,            "bad md6 key length" },
-    { EXTRA_E_MD6_STATENOTINIT,         "md6 state not initialized" },
-    { EXTRA_E_MD6_STACKUNDERFLOW,       "md6 stack underflows" },
-    { EXTRA_E_MD6_STACKOVERFLOW,        "md6 stack overflow (message too long)" },
-    { EXTRA_E_MD6_NULLDATA,             "null data pointer to md6" },
-    { EXTRA_E_MD6_NULL_N,               "md6 compress: N is null" },
-    { EXTRA_E_MD6_NULL_B,               "md6 standard compress: B is null" },
-    { EXTRA_E_MD6_BAD_ELL,              "md6 standard compress: ell not in {0,255}" },
-    { EXTRA_E_MD6_BAD_p,                "md6 standard compress: p<0 or p>b*w" },
-    { EXTRA_E_MD6_NULL_K,               "md6 standard compress: K is null" },
-    { EXTRA_E_MD6_NULL_Q,               "md6 standard compress: Q is null" },
-    { EXTRA_E_MD6_NULL_C,               "md6 standard compress: C is null" },
-    { EXTRA_E_MD6_BAD_L,                "md6 standard compress or init: L<0 or L>255" },
-    { EXTRA_E_MD6_BAD_r,                "md6 compress or init: r<0 or r>255" },
-    { EXTRA_E_MD6_OUT_OF_MEMORY,        "md6 compress: storage allocation failed" },
+    GLOBAL_EXTRA_REASONS,
+    CRYPT_REASONS,
+    MD6_REASONS,
     { 0, NULL }
 };
 
@@ -84,17 +63,13 @@ static struct provider_ctx_st *provider_ctx_new(const OSSL_CORE_HANDLE *core,
 
 /* The table of digests this provider offers */
 static const OSSL_ALGORITHM digests[] = {
-    { "md6", "x.author='" AUTHOR "'", o_md6_functions },
-    { "md6-224", "x.author='" AUTHOR "'", o_md6_224_functions },
-    { "md6-256", "x.author='" AUTHOR "'", o_md6_256_functions },
-    { "md6-384", "x.author='" AUTHOR "'", o_md6_384_functions },
-    { "md6-512", "x.author='" AUTHOR "'", o_md6_512_functions },
+    MD6_ALGORITHMS("provider_extra"),
     { NULL , NULL, NULL }
 };
 
 /* The table of kdfs this provider offers */
 static const OSSL_ALGORITHM kdfs[] = {
-    { "crypt", "x.author='" AUTHOR "'", crypt_functions },
+    CRYPT_ALGORITHMS("provider=extra"),
     { NULL , NULL, NULL }
 };
 

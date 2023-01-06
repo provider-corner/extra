@@ -29,6 +29,7 @@
 #include "prov/num.h"
 
 #include "local.h"
+#include "crypt_data.h"
 
 /*
  * Forward declarations to ensure we get signatures right.  All the
