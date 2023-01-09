@@ -63,7 +63,7 @@ static struct provider_ctx_st *provider_ctx_new(const OSSL_CORE_HANDLE *core,
 
 /* The table of digests this provider offers */
 static const OSSL_ALGORITHM digests[] = {
-    MD6_ALGORITHMS("provider_extra"),
+    MD6_ALGORITHMS("provider=extra"),
     { NULL , NULL, NULL }
 };
 
