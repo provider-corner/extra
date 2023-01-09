@@ -64,25 +64,7 @@ Included algorithms
 
 ### KDFs
 
-#### crypt, an implementation of **crypt(3)**
-
-This KDF has the following output parameter:
-
--   "size", for which an unsigned integer is returned.  The size
-    is always 13.
-
-It also has the following input parameters:
-
--   "pass"; the value must be a string.
--   "salt"; the value must be a string with at least two ASCII
-    characters.  Only the first two characters are used.
-
-Example usage, using the `openssl` command:
-
-``` console
-$ openssl kdf -provider-path _build/ -provider extra -provider default -keylen 13 -kdfopt pass:12345 -kdfopt salt:xx -binary crypt
-xxwddmriJc5TI
-```
+-   [crypt](crypt.md)
 
 ### Hashes
 
