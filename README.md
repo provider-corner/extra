@@ -16,6 +16,12 @@ Essentially, if you really want to use some very old algorithm of some
 sort, or want to play on the bleeding edge, or are in a rush trying
 something new, chances are you'll find it here.
 
+Documentation
+-------------
+
+The provider as a whole is documented in [extra.md](extra.md), which
+also holds further links to the documentation of included algorithms.
+
 Building
 --------
 
@@ -38,37 +44,16 @@ To build, do this:
 
 The result is `_build/extra.so` or `_build/extra.dll`.
 
-Usage examples
---------------
+Testing
+-------
 
-Listing this repository:
+Testing is done using ctest, like this:
 
-``` console
-$ openssl list -provider-path _build/ -provider extra -providers -verbose
-Providers:
-  extra
-    version: 0.1
-    build info: Debug
-```
+    (cd _build; ctest)
 
-Properties
-----------
+For more verbosity:
 
-All algorithms in this provider use the property "x.author" with an
-identifier for the author of the code.  This can be used to fetch that
-particular implementation, should there be several implementations of
-the same algorithm present.
-
-Included algorithms
--------------------
-
-### KDFs
-
--   [crypt](crypt.md)
-
-### Hashes
-
--   [md6](md6.md)
+    (cd _build; ctest -VV)
 
 <!-- Logos and Badges -->
 
