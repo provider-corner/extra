@@ -22,6 +22,12 @@ Documentation
 The provider as a whole is documented in [extra.md](extra.md), which
 also holds further links to the documentation of included algorithms.
 
+Contributions
+-------------
+
+You are welcome to contribute to this project.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 Building
 --------
 
