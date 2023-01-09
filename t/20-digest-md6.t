@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use File::Temp qw(tempfile);
 use Test2::V0;
-use IPC::Run qw(run);
 
 # The cases are taken from "Sample MD6 calculations" in
 # http://www.jayantkrish.com/papers/md6_report.pdf
@@ -90,7 +89,13 @@ foreach (@cases) {
     unlink $input;
 }
 
+use IPC::Cmd qw(run);
 foreach (@badcases) {
+  SKIP:
+    skip "Can't run IPC::Cmd::run()", 2
+        unless ( IPC::Cmd->can_use_ipc_open3()
+                 || IPC::Cmd->can_use_ipc_run() );
+
     local $ENV{MD6_BITS}   = $_->{size};
 
     my $message = $_->{message} // generate_chars($_->{message_length});
@@ -98,19 +103,24 @@ foreach (@badcases) {
     print $fh $message;
     close $fh;
 
-    my $title =
+    my $title_run =
         defined $_->{message}
-        ? "check that dsgt('$message') becomes '$_->{result}'"
-        : "check that dsgt(generated $_->{message_length} characters) becomes '$_->{result}'";
+        ? "failing to run dsgt('$message') when"
+        : "failing to run dsgt(generated $_->{message_length} characters) when";
+    my $title_compare =
+        "checking that the error message includes '$_->{result}'";
 
-    my $out;
-    my $err;
     local $ENV{MD6_BITS}   = $_->{size};
 
-    ok(!run([qw(openssl dgst -provider extra -md6)],
-            \$input, \$out, \$err));
-    like($err, $_->{result},
-         $title." using MD6_BITS=$_->{size}");
-
+    my ($ok, $err, $full_buf, $stdout_buff, $stderr_buff)
+        = run(command => "openssl dgst -provider extra -md6 < $input");
+    print STDERR join("\n", @$stderr_buff);
+    ok(!$ok, $title_run." using MD6_BITS=$_->{size}");
     unlink $input;
+
+    skip "The run was bad (successful), so no need to compare", 1
+        if $ok;
+
+    like(join("\n", @$stderr_buff), $_->{result},
+         $title_compare." using MD6_BITS=$_->{size}");
 }
