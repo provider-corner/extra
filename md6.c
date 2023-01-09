@@ -482,6 +482,43 @@ const OSSL_DISPATCH o_md6_functions[] = {
     { 0, NULL }
 };
 
+static void ctx_init_128(struct o_md6_ctx_st *ctx)
+{
+    ctx->hash_bits_hard_coded = 1;
+    ctx->hash_bits = 128;
+}
+
+static void *o_md6_128_newctx(void *vprovctx)
+{
+    return newctx_init(vprovctx, ctx_init_128);
+}
+
+static int o_md6_128_get_params(OSSL_PARAM params[])
+{
+    struct o_md6_ctx_st fake_ctx = { 0, };
+
+    ctx_init_128(&fake_ctx);
+    set_defaults(&fake_ctx);
+    return o_md6_get_ctx_params(&fake_ctx, params);
+}
+
+/* The md6-128 dispatch tables */
+const OSSL_DISPATCH o_md6_128_functions[] = {
+    { OSSL_FUNC_DIGEST_NEWCTX, (funcptr_t)o_md6_128_newctx },
+    { OSSL_FUNC_DIGEST_FREECTX, (funcptr_t)o_md6_freectx },
+    { OSSL_FUNC_DIGEST_DUPCTX, (funcptr_t)o_md6_dupctx },
+    { OSSL_FUNC_DIGEST_INIT, (funcptr_t)o_md6_init },
+    { OSSL_FUNC_DIGEST_UPDATE, (funcptr_t)o_md6_update },
+    { OSSL_FUNC_DIGEST_FINAL, (funcptr_t)o_md6_final },
+    { OSSL_FUNC_DIGEST_GET_PARAMS, (funcptr_t)o_md6_128_get_params },
+    { OSSL_FUNC_DIGEST_GETTABLE_PARAMS, (funcptr_t)o_md6_gettable_params },
+    { OSSL_FUNC_DIGEST_GET_CTX_PARAMS, (funcptr_t)o_md6_get_ctx_params },
+    { OSSL_FUNC_DIGEST_GETTABLE_CTX_PARAMS, (funcptr_t)o_md6_gettable_ctx_params },
+    { OSSL_FUNC_DIGEST_SET_CTX_PARAMS, (funcptr_t)o_md6_set_ctx_params },
+    { OSSL_FUNC_DIGEST_SETTABLE_CTX_PARAMS, (funcptr_t)o_md6_settable_ctx_params },
+    { 0, NULL }
+};
+
 static void ctx_init_224(struct o_md6_ctx_st *ctx)
 {
     ctx->hash_bits_hard_coded = 1;

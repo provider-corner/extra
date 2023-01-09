@@ -1,6 +1,7 @@
 /* CC-BY license applied, see LICENCE.md */
 
 extern const OSSL_DISPATCH o_md6_functions[];
+extern const OSSL_DISPATCH o_md6_128_functions[];
 extern const OSSL_DISPATCH o_md6_224_functions[];
 extern const OSSL_DISPATCH o_md6_256_functions[];
 extern const OSSL_DISPATCH o_md6_384_functions[];
@@ -9,6 +10,7 @@ extern const OSSL_DISPATCH o_md6_512_functions[];
 #define MD6_AUTHOR "@levitte"
 #define MD6_ALGORITHMS(globalprops)                                     \
     { "md6", "provider=extra,x.author='" AUTHOR "'", o_md6_functions }, \
+    { "md6-128", "provider=extra,x.author='" AUTHOR "'", o_md6_128_functions }, \
     { "md6-224", "provider=extra,x.author='" AUTHOR "'", o_md6_224_functions }, \
     { "md6-256", "provider=extra,x.author='" AUTHOR "'", o_md6_256_functions }, \
     { "md6-384", "provider=extra,x.author='" AUTHOR "'", o_md6_384_functions }, \
