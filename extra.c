@@ -10,6 +10,7 @@
 #include "prov/err.h"
 #include "prov/num.h"
 
+#include "export.h"
 #include "local.h"
 #include "crypt_data.h"
 #include "md6_data.h"
@@ -139,10 +140,11 @@ static const OSSL_DISPATCH provider_functions[] = {
     { 0, NULL }
 };
 
-int OSSL_provider_init(const OSSL_CORE_HANDLE *core,
-                       const OSSL_DISPATCH *in,
-                       const OSSL_DISPATCH **out,
-                       void **vprovctx)
+EXTRA_EXPORT int
+OSSL_provider_init(const OSSL_CORE_HANDLE *core,
+                   const OSSL_DISPATCH *in,
+                   const OSSL_DISPATCH **out,
+                   void **vprovctx)
 {
     if ((*vprovctx = provider_ctx_new(core, in)) == NULL)
         return 0;
