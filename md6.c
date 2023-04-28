@@ -311,7 +311,7 @@ static int o_md6_update(void *vctx, const unsigned char *in, size_t inl)
      * If sizeof(inl) is less than sizeof(uint64_t), there's no point checking.
      */
     if (sizeof(inl) >= sizeof(uint64_t) - 1
-        && inl > (((uint64_t)1)<<56 - 1)) {
+        && inl > ((((uint64_t)1)<<56) - 1)) {
         ERR_raise(ERR_HANDLE(ctx), EXTRA_E_INVALID_INPUT_LENGTH);
         return 0;
     }
