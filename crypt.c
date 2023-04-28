@@ -28,6 +28,7 @@
 #include "prov/err.h"
 #include "prov/num.h"
 
+#include "e_params.h"
 #include "local.h"
 #include "crypt_data.h"
 
@@ -154,7 +155,7 @@ static int crypt_derive(void *vctx, unsigned char *key, size_t keylen,
 static const OSSL_PARAM *crypt_gettable_params(void *provctx)
 {
     static const OSSL_PARAM table[] = {
-        { "size", OSSL_PARAM_UNSIGNED_INTEGER, NULL, sizeof(size_t), 0 },
+        { S_PARAM_size, OSSL_PARAM_UNSIGNED_INTEGER, NULL, sizeof(size_t), 0 },
         { NULL, 0, NULL, 0, 0 },
     };
 
@@ -166,13 +167,12 @@ static int crypt_get_params(OSSL_PARAM params[])
     OSSL_PARAM *p;
     int ok = 1;
 
-    for (p = params; p->key != NULL; p++) {
-        if (strcasecmp(p->key, "size") == 0)
-            if (provnum_set_size_t(p, RESULTING_KEYLENGTH + 1) < 0) {
-                ok = 0;
-                continue;
-            }
-    }
+    for (p = params; p->key != NULL; p++)
+        switch (extra_params_parse(p->key)) {
+        case V_PARAM_size:
+            ok &= (provnum_set_size_t(p, RESULTING_KEYLENGTH + 1) >= 0);
+            break;
+        }
     return ok;
 }
 
@@ -180,8 +180,8 @@ static int crypt_get_params(OSSL_PARAM params[])
 static const OSSL_PARAM *crypt_settable_ctx_params(void *cctx, void *provctx)
 {
     static const OSSL_PARAM table[] = {
-        { "pass", OSSL_PARAM_UTF8_STRING, NULL, 0, 0 },
-        { "salt", OSSL_PARAM_UTF8_STRING, NULL, 0, 0 },
+        { S_PARAM_pass, OSSL_PARAM_UTF8_STRING, NULL, 0, 0 },
+        { S_PARAM_salt, OSSL_PARAM_UTF8_STRING, NULL, 0, 0 },
         { NULL, 0, NULL, 0, 0 },
     };
 
@@ -195,34 +195,36 @@ static int crypt_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     int ok = 1;
 
     for (p = params; p->key != NULL; p++)
-        if (strcasecmp(p->key, "pass") == 0) {
+        switch (extra_params_parse(p->key)) {
+        case V_PARAM_pass:
+        {
             char *newpass = strndup(p->data, p->data_size);
 
             if (newpass == NULL) {
                 ERR_raise(ERR_HANDLE(ctx), ERR_R_MALLOC_FAILURE);
                 ok = 0;
-                continue;
+            } else {
+                free(ctx->pass);
+                ctx->pass = newpass;
             }
-
-            free(ctx->pass);
-            ctx->pass = newpass;
-        } else if (strcasecmp(p->key, "salt") == 0) {
+            break;
+        }
+        case V_PARAM_salt:
+        {
             char *newsalt;
 
             if (p->data_size < 2) {
                 ERR_raise(ERR_HANDLE(ctx), EXTRA_E_CRYPT_SALT_TOO_SMALL);
                 ok = 0;
-                continue;
-            }
-
-            if ((newsalt = strndup(p->data, p->data_size)) == NULL) {
+            } else if ((newsalt = strndup(p->data, p->data_size)) == NULL) {
                 ERR_raise(ERR_HANDLE(ctx), ERR_R_MALLOC_FAILURE);
                 ok = 0;
-                continue;
+            } else {
+                free(ctx->salt);
+                ctx->salt = newsalt;
             }
-
-            free(ctx->salt);
-            ctx->salt = newsalt;
+            break;
+        }
         }
     return ok;
 }

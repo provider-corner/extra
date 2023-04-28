@@ -38,8 +38,17 @@ endif()
 include(libprov/cmake/provider.cmake)
 setup_provider_openssl()
 
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/e_params.c
+                          ${CMAKE_CURRENT_SOURCE_DIR}/e_params.h
+                   COMMAND perl ${CMAKE_CURRENT_SOURCE_DIR}/libprov/perl/gen_param_LL.pl
+                           ${CMAKE_CURRENT_SOURCE_DIR}/e_params.c
+                           ${CMAKE_CURRENT_SOURCE_DIR}/e_params.h
+                           ${CMAKE_CURRENT_SOURCE_DIR}/extra_params.dat
+                   MAIN_DEPENDENCY extra_params.dat
+                   DEPENDS libprov/perl/gen_param_LL.pl)
 set(extra_source
     extra.c
+    e_params.c
     # Implement The "crypt" KDF, using libcrypt or OpenSSL's DES_crypt()
     crypt.c
     # Implement MD6, with help from the reference implementation

@@ -11,6 +11,7 @@
 #include "prov/num.h"
 
 #include "export.h"
+#include "e_params.h"
 #include "local.h"
 #include "crypt_data.h"
 #include "md6_data.h"
@@ -108,17 +109,23 @@ static int extra_prov_get_params(void *provctx, OSSL_PARAM *params)
     int ok = 1;
 
     for(p = params; p->key != NULL; p++)
-        if (strcasecmp(p->key, "version") == 0) {
+        switch (extra_params_parse(p->key)) {
+        case V_PARAM_version:
             *(const void **)p->data = VERSION;
             p->return_size = strlen(VERSION);
-        } else if (strcasecmp(p->key, "buildinfo") == 0
-                   && BUILDTYPE[0] != '\0') {
-            *(const void **)p->data = BUILDTYPE;
-            p->return_size = strlen(BUILDTYPE);
-        } else if (strcasecmp(p->key, "author") == 0
-                   && AUTHOR[0] != '\0') {
-            *(const void **)p->data = AUTHOR;
-            p->return_size = strlen(AUTHOR);
+            break;
+        case V_PARAM_buildinfo:
+            if (BUILDTYPE[0] != '\0') {
+                *(const void **)p->data = BUILDTYPE;
+                p->return_size = strlen(BUILDTYPE);
+            }
+            break;
+        case V_PARAM_author:
+            if (AUTHOR[0] != '\0') {
+                *(const void **)p->data = AUTHOR;
+                p->return_size = strlen(AUTHOR);
+            }
+            break;
         }
     return ok;
 }

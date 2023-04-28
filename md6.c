@@ -13,6 +13,7 @@
 #include "prov/err.h"
 #include "prov/num.h"
 
+#include "e_params.h"
 #include "local.h"
 #include "md6_data.h"
 
@@ -350,15 +351,15 @@ static int o_md6_final(void *vctx, unsigned char *out, size_t *outl,
 }
 
 /* Parameter handling */
-# define common_table                                           \
-    { "rounds", OSSL_PARAM_INTEGER, NULL, sizeof(int), 0 },     \
-    { "mode", OSSL_PARAM_INTEGER, NULL, sizeof(int), 0 }
+# define common_table                                                   \
+    { S_PARAM_rounds, OSSL_PARAM_INTEGER, NULL, sizeof(int), 0 },       \
+    { S_PARAM_mode, OSSL_PARAM_INTEGER, NULL, sizeof(int), 0 }
 
 /* Parameters that libcrypto can get from this implementation */
 static const OSSL_PARAM *o_md6_gettable_params(void *provctx)
 {
     static const OSSL_PARAM table[] = {
-        { "size", OSSL_PARAM_UNSIGNED_INTEGER, NULL, sizeof(size_t), 0 },
+        { S_PARAM_size, OSSL_PARAM_UNSIGNED_INTEGER, NULL, sizeof(size_t), 0 },
         common_table,
         { NULL, 0, NULL, 0, 0 },
     };
@@ -378,7 +379,7 @@ static int o_md6_get_params(OSSL_PARAM params[])
 static const OSSL_PARAM *o_md6_gettable_ctx_params(void *vctx, void *provctx)
 {
     static const OSSL_PARAM table[] = {
-        { "size", OSSL_PARAM_UNSIGNED_INTEGER, NULL, sizeof(size_t), 0 },
+        { S_PARAM_size, OSSL_PARAM_UNSIGNED_INTEGER, NULL, sizeof(size_t), 0 },
         common_table,
         { NULL, 0, NULL, 0, 0 },
     };
@@ -392,23 +393,18 @@ static int o_md6_get_ctx_params(void *vctx, OSSL_PARAM params[])
     struct o_md6_ctx_st *ctx = vctx;
     int ok = 1;
 
-    for (p = params; p->key != NULL; p++) {
-        if (strcasecmp(p->key, "size") == 0
-            && provnum_set_size_t(p, ctx->hash_size) < 0) {
-            ok = 0;
-            continue;
+    for (p = params; p->key != NULL; p++)
+        switch (extra_params_parse(p->key)) {
+        case V_PARAM_size:
+            ok &= (provnum_set_size_t(p, ctx->hash_size) >= 0);
+            break;
+        case V_PARAM_rounds:
+            ok &= (provnum_set_int(p, ctx->rounds) >= 0);
+            break;
+        case V_PARAM_mode:
+            ok &= (provnum_set_int(p, ctx->mode) >= 0);
+            break;
         }
-        if (strcasecmp(p->key, "rounds") == 0
-            && provnum_set_int(p, ctx->rounds) < 0) {
-            ok = 0;
-            continue;
-        }
-        if (strcasecmp(p->key, "mode") == 0
-            && provnum_set_int(p, ctx->mode) < 0) {
-            ok = 0;
-            continue;
-        }
-    }
     return ok;
 }
 
@@ -416,7 +412,7 @@ static int o_md6_get_ctx_params(void *vctx, OSSL_PARAM params[])
 static const OSSL_PARAM *o_md6_settable_ctx_params(void *vctx, void *provctx)
 {
     static const OSSL_PARAM table[] = {
-        { "size", OSSL_PARAM_INTEGER, NULL, sizeof(size_t), 0 },
+        { S_PARAM_size, OSSL_PARAM_INTEGER, NULL, sizeof(size_t), 0 },
         common_table,
         { NULL, 0, NULL, 0, 0 },
     };
@@ -439,28 +435,26 @@ static int o_md6_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     char *env_val;
 
     if (params != NULL)
-        for (p = params; p->key != NULL; p++) {
-            if (strcasecmp(p->key, "size") == 0) {
+        for (p = params; p->key != NULL; p++)
+            switch (extra_params_parse(p->key)) {
+            case V_PARAM_size:
                 if (ctx->hash_bits_hard_coded) {
                     ERR_raise_data(ERR_HANDLE(ctx), EXTRA_E_HARD_CODED_VALUE,
                                    "size");
                     ok = 0;
-                    continue;
                 } else if (provnum_get_size_t(&ctx->hash_size, p) < 0) {
                     ok = 0;
-                    continue;
+                } else {
+                    ctx->hash_bits = ctx->hash_size * 8;
                 }
-                ctx->hash_bits = ctx->hash_size * 8;
-            } else if (strcasecmp(p->key, "rounds") == 0
-                       && provnum_get_int(&ctx->rounds, p) < 0) {
-                ok = 0;
-                continue;
-            } else if (strcasecmp(p->key, "mode") == 0
-                       && provnum_get_int(&ctx->mode, p) < 0) {
-                ok = 0;
-                continue;
+                break;
+            case V_PARAM_rounds:
+                ok &= (provnum_get_int(&ctx->rounds, p) >= 0);
+                break;
+            case V_PARAM_mode:
+                ok &= (provnum_get_int(&ctx->mode, p) >= 0);
+                break;
             }
-        }
     return ok;
 }
 

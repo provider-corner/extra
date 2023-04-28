@@ -1,3 +1,5 @@
 *~
 CMakeUserPresets.json
 export.h
+e_params.c
+e_params.h
