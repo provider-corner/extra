@@ -51,8 +51,7 @@ set_target_properties(extra
   PROPERTIES
     VISIBILITY_INLINES_HIDDEN 1
     C_VISIBILITY_PRESET hidden
-    LINKER_LANGUAGE C
-    VERSION ${PROJECT_VERSION})
+    LINKER_LANGUAGE C)
 generate_export_header(extra
   EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/export.h
   CUSTOM_CONTENT_FROM_VARIABLE export_custom_content)
