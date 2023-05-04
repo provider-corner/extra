@@ -20,6 +20,16 @@ sub load {
     print STDERR "$_=", $ENV{$_} // '', "\n"
         foreach qw(OPENSSL_CRYPTO_LIBRARY OPENSSL_PROGRAM OPENSSL_ROOT_DIR);
 
+    my $build_type = lc($ENV{BUILD_TYPE}) || "debug";
+    $build_type = "optimized" if $build_type ne "debug";
+    my $openssl_crypto_library = $ENV{OPENSSL_CRYPTO_LIBRARY};
+    $openssl_crypto_library = "general;$openssl_crypto_library"
+        if $openssl_crypto_library !~ m|;|;
+    my %openssl_crypto_library = split(m|;|, $openssl_crypto_library);
+    $openssl_crypto_library =
+        $openssl_crypto_library{$build_type}
+        // $openssl_crypto_library{general};
+
     my $openssl_libdir = dirname($ENV{OPENSSL_CRYPTO_LIBRARY})
         if $ENV{OPENSSL_CRYPTO_LIBRARY};
     my $openssl_bindir = dirname($ENV{OPENSSL_PROGRAM})

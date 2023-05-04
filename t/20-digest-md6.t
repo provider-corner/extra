@@ -76,13 +76,13 @@ foreach (@cases) {
         ? "check that dsgt('$message') becomes '$_->{result}'"
         : "check that dsgt(generated $_->{message_length} characters) becomes '$_->{result}'";
 
-    is(`cat $input | openssl dgst -provider extra -md6-$_->{size}`,
+    is(`openssl dgst -provider extra -md6-$_->{size} < $input`,
        "md6-$_->{size}(stdin)= $_->{result}\n",
        $title." using md6-$_->{size}");
 
     local $ENV{MD6_BITS}   = $_->{size};
 
-    is(`cat $input | openssl dgst -provider extra -md6`,
+    is(`openssl dgst -provider extra -md6 < $input`,
        "md6(stdin)= $_->{result}\n",
        $title." using MD6_BITS=$_->{size}");
 
