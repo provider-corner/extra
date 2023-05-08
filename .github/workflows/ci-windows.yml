@@ -52,7 +52,7 @@ jobs:
           $cwd = Get-Location
           cmake -A ${{ matrix.platform.cmake-arch }} -DCMAKE_PREFIX_PATH="$cwd\openssl-install" -S . -B _build
       - name: build the Extra provider
-        run: cmake --build _build
+        run: cmake --build _build --config Release
       - name: test the Extra provider
-        run: ctest -VV -C Debug
+        run: ctest -VV -C Release
         working-directory: _build
