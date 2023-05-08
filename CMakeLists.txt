@@ -66,21 +66,14 @@ generate_export_header(extra
   CUSTOM_CONTENT_FROM_VARIABLE export_custom_content)
 
 # Testing
-if (DEFINED MSVC)
-  # This is frustrating!  I've tried guessing at all sorts of variables,
-  # as well as getting the target property LIBRARY_OUTPUT_DIRECTORY using
-  # get_target_property() as well as generator expressions, but to not avail.
-  # So for now, the MODULES path gets hardcoded from observed builds.
-  if (NOT CMAKE_BUILD_TYPE)
-    # From observation, it seems that Debug is the default
-    set(EXTRA_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/Debug")
-  else()
-    set(EXTRA_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
-  endif()
+get_property(_is_multiconfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if (_is_multiconfig)
+  set(EXTRA_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>")
 else()
   set(EXTRA_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}")
 endif()
-message(STATUS "Determined the Extra provider location to '${EXTRA_MODULE_DIRECTORY}'")
+unset(_is_multiconfig)
+message(STATUS "Determined the build time Extra provider location to be '${EXTRA_MODULE_DIRECTORY}'")
 
 set(TEST_ENVIRONMENT
   "BUILD_TYPE=${CMAKE_BUILD_TYPE}"
