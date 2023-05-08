@@ -94,37 +94,6 @@ add_test(NAME openssl
   COMMAND ${PROVE} -PWrapOpenSSL ${CMAKE_CURRENT_SOURCE_DIR}/t)
 set_tests_properties(openssl PROPERTIES ENVIRONMENT "${TEST_ENVIRONMENT}")
 
-# Find out where to install the provider module
-# We use well known environment variables to allow the correct shared
-# libraries to be used with the 'openssl' program.  For non-Unix platforms,
-# these variables don't matter.
-if (NOT DEFINED OPENSSL_LIBRARY_DIR)
-  cmake_path(GET OPENSSL_SSL_LIBRARY PARENT_PATH OPENSSL_LIBRARY_DIR)
-endif()
-if (NOT DEFINED OPENSSL_MODULES_DIR)
-  file(TO_NATIVE_PATH "${OPENSSL_PROGRAM}" OPENSSL_PROGRAM_NATIVE)
-  message(DEBUG "OPENSSL_PROGRAM = '${OPENSSL_PROGRAM}' => OPENSSL_PROGRAM_NATIVE = '${OPENSSL_PROGRAM_NATIVE}'")
-  if (MSVC)
-    execute_process(
-      COMMAND
-        "${OPENSSL_PROGRAM_NATIVE}" info -modulesdir
-      OUTPUT_VARIABLE OPENSSL_MODULES_DIR
-    )
-  else()
-    execute_process(
-      COMMAND
-        ${CMAKE_COMMAND} -E env
-          LD_LIBRARY_PATH=${OPENSSL_LIBRARY_DIR}
-          DYLD_LIBRARY_PATH=${OPENSSL_LIBRARY_DIR}
-          LIBPATH=${OPENSSL_LIBRARY_DIR}
-          "${OPENSSL_PROGRAM_NATIVE}" info -modulesdir
-      OUTPUT_VARIABLE OPENSSL_MODULES_DIR
-    )
-  endif()
-  string(STRIP "${OPENSSL_MODULES_DIR}" OPENSSL_MODULES_DIR)
-  file(TO_CMAKE_PATH "${OPENSSL_MODULES_DIR}" OPENSSL_MODULES_DIR)
-endif()
-message(STATUS "Will install in ${OPENSSL_MODULES_DIR}")
-
 # Installing
+message(STATUS "Will install in ${OPENSSL_MODULES_DIR}")
 install(TARGETS extra DESTINATION ${OPENSSL_MODULES_DIR})
