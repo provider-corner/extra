@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2024 "extra" provider collective
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
 # crypt, an implementation of **crypt(3)**
 
 This implementation only supports the original [POSIX **crypt(3)**],

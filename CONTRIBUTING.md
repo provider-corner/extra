@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2022-2024 "extra" provider collective
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
 # Contributing code
 
 When writing code for this project, have a look into the [HOWTO](HOWTO/)
@@ -17,6 +23,24 @@ these are the commands to do so:
 
 Of course, it's just as viable to fork this repository using github.com's
 web UI and to clone using the usual `git clone` command.
+
+## License and attribution
+
+If you're adding a new file, please add a copyright and license boilerplate
+in the same SPDX style as in already existing files.  If you use the [REUSE]
+tool, this is a simple command line to do this:
+
+    $ reuse annotate --no-replace \
+      --copyright='"extra" provider collective' \
+      --license=LGPL-3.0-or-later \
+      FILE
+
+If you're modifying an existing file, please update the copyright year range
+to include the current year.
+
+If you want attribution, please consider adding your name in COLLECTIVE.md.
+
+[REUSE]: https://reuse.software/
 
 ## Commits
 

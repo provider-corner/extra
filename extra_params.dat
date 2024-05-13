@@ -1,4 +1,9 @@
 # -*- perl -*-
+
+# SPDX-FileCopyrightText: 2023-2024 "extra" provider collective
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
 [ "extra_params_parse",
   # From md6
   PARAM_rounds => "rounds",

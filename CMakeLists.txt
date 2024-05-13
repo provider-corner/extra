@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022-2024 "extra" provider collective
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
   extra-provider

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023-2024 "extra" provider collective
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 /* CC-BY license applied, see LICENCE.md */
 
 extern const OSSL_DISPATCH crypt_functions[];

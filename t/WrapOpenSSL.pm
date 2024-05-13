@@ -1,6 +1,8 @@
 #! /usr/bin/env perl
+
+# SPDX-FileCopyrightText: 2023-2024 "extra" provider collective
 #
-# CC0 license applied, see LICENSE.md
+# SPDX-License-Identifier: LGPL-3.0-or-later
 
 package WrapOpenSSL;
 use strict;

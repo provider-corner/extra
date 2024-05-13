@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2024 "extra" provider collective
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
 # md6, a (forgotten?) SHA-3 contender
 
 This implements md6 for OpenSSL 3, following the [md6 report] and

@@ -1,0 +1,21 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: extra
+Upstream-Contact: Richard Levitte <richard@levitte.org>
+Source: 
+
+# Sample paragraph, commented out:
+#
+# Files: src/*
+# Copyright: $YEAR $NAME <$CONTACT>
+# License: ...
+
+# It may seem silly to have a copyright statement for a file licensed with
+# CC0-1.0.  However, the dep5 file format really really wants that line, so...
+# https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Files: .gitmodules
+Copyright: 2022-2024 "extra" provider collective
+License: CC0-1.0
+
+Files: external/md6*
+Copyright: 2008 Ronald L. Rivest
+License: LicenseRef-MIT-RonaldRivest

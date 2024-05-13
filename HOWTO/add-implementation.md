@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2024 "extra" provider collective
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
 # HOWTO Add a new implementation
 
 A new implementation of an algorithm should be fairly self contained,

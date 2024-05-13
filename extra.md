@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2024 "extra" provider collective
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
 # "extra", the provider with extra algorithm implementations
 
 This provider includes a number of algorithms that didn't fit the criteria

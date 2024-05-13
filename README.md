@@ -1,20 +1,36 @@
+<!--
+SPDX-FileCopyrightText: 2022-2024 "extra" provider collective
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
 [![github actions ci badge]][github actions ci]
 [![github actions windows ci badge]][github actions windows ci]
-
-![CC-BY](https://i.creativecommons.org/l/by/4.0/80x15.png)
 
 'Extra' provider
 ================
 
 This is an extra provider for OpenSSL 3, with stuff that doesn't exist
 there for diverse reasons, ranging from having fallen so much out of
-favor that it isn't included even in the legacy provider, to stuff
+favor that it isn't included even in OpenSSL's legacy provider, to stuff
 that is too experimental, or needs to mature further before inclusion
 in OpenSSL's official providers.
 
 Essentially, if you really want to use some very old algorithm of some
 sort, or want to play on the bleeding edge, or are in a rush trying
 something new, chances are you'll find it here.
+
+Your rights and obligations
+---------------------------
+
+This provider as a whole is licensed with the Lesser GNU Public
+License (LGPL), 3.0 or later.  Some individual files may be licensed
+with a different license, that are deemed compatible with the LGPL.
+
+Please see the files themselves, or in some cases .reuse/dep5, to find
+out what license govern each of them in particular.  Please see the
+LICENSES subdirectory to study the licenses themselves if they aren't
+in full in the files themselves.
 
 Documentation
 -------------

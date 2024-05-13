@@ -1,3 +1,9 @@
+# -*- perl -*-
+
+# SPDX-FileCopyrightText: 2023-2024 "extra" provider collective
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
 use strict;
 use warnings;
 use File::Temp qw(tempfile);
